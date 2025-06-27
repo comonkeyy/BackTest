@@ -1,11 +1,30 @@
 // src/app.js
-const express = require('express');
+require("dotenv").config();
+const cors = require("cors");
+const express = require("express");
 const app = express();
-
 // DB 연결 실행
-require('./config/db');
+require("./config/db");
 
-// 기타 미들웨어, 라우터 등
+const authRouter = require("./routes/auth.routes");
+
+app.use(cors()); // 모든 도메인 허용 (개발용)
+
 app.use(express.json());
+app.get("/", (req, res) => {
+  res.status(200).send("TodoList API 서버가 정상 작동 중입니다.");
+});
+app.use("/api/auth", authRouter);
+
+// 모든 라우터 뒤에 추가 (가장 마지막 미들웨어)
+app.use((err, req, res, next) => {
+  console.error(err.stack); // 서버 로그 출력
+
+  // 클라이언트에 에러 응답
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 module.exports = app;
