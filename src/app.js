@@ -2,32 +2,66 @@ require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 const app = express();
+
 const houseRoutes = require("./routes/house.routes");
+const adminRoutes = require("./routes/admin.routes");
+const managerRoutes = require("./routes/manager.routes");
+const authRouter = require("./routes/auth.routes");
+const houseNeedRouter = require("./routes/houseNeed.routes");
 
 // DB 연결 실행
 require("./config/db");
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.use(cors());
+app.use(express.json());
 const authRouter = require("./routes/auth.routes");
 const houseNeedRouter = require("./routes/houseNeed.routes");
 const reviewRouter = require("./routes/review.routes");
 app.use(cors()); // 모든 도메인 허용 (개발용)
 app.use(express.json()); // <-- 반드시 라우터 등록 전에!
-
-app.use("/houses", houseRoutes);
+app.use("/api/houses", houseRoutes);
 app.use("/api/auth", authRouter);
+app.use("/api/care-workers", houseNeedRouter);
+
+app.use("/api/admin", adminRoutes);      // 관리자 회원가입/로그인
+app.use("/api/manager", managerRoutes);  // 관리자 권한 기능(매칭 등)
 
 app.get("/", (req, res) => {
-  res.status(200).send("TodoList API 서버가 정상 작동 중입니다.");
+  res.status(200).send("API 서버가 정상 작동 중입니다.");
 });
+
+
+
+
+
+
+
+
 
 app.use("/api/care-workers", houseNeedRouter);
 app.use("/api/reviews", reviewRouter);
-
-// 모든 라우터 뒤에 추가 (가장 마지막 미들웨어)
 app.use((err, req, res, next) => {
-  console.error(err.stack); // 서버 로그 출력
-
-  // 클라이언트에 에러 응답
+  console.error(err.stack);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",

@@ -1,6 +1,5 @@
-// 인증 및 오류 처리 등
-// auth.middleware.js
 const jwt = require("jsonwebtoken");
+
 module.exports = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -14,6 +13,7 @@ module.exports = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
+    err.status = 401;
     return next(err);
   }
 };
