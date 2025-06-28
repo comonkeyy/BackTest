@@ -3,7 +3,6 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
 const refreshTokens = new Set();
 
 module.exports = {
@@ -195,6 +194,67 @@ module.exports = {
       }
     );
   },
+
+    // 전체 계정 목록 조회
+    getAll: (callback) => {
+        db.query(
+          "SELECT id, user_id, name, email, phone, role, created_at FROM users ORDER BY created_at DESC",
+          [],
+          (err, results) => callback(err, results)
+        );
+      },
+    
+      // 특정 계정 상세 조회
+      getById: (userId, callback) => {
+        db.query(
+          "SELECT id, user_id, name, email, phone, role, created_at FROM users WHERE id = ?",
+          [userId],
+          (err, results) => callback(err, results[0])
+        );
+      },
+    
+      // 계정 신규 등록 (관리자에서 직접 생성)
+      create: ({ user_id, password, name, email, phone, role }, callback) => {
+        // 비밀번호는 반드시 암호화해서 저장!
+        const saltRounds = 10;
+        bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+          if (err) return callback(err);
+          db.query(
+            "INSERT INTO users (user_id, password, name, email, phone, role) VALUES (?, ?, ?, ?, ?, ?)",
+            [user_id, hashedPassword, name, email, phone, role],
+            (err, result) => callback(err, result)
+          );
+        });
+      },
+    
+      // 계정 정보 수정 (관리자용)
+      update: (userId, updateData, callback) => {
+        // 동적으로 쿼리 생성
+        const fields = [];
+        const values = [];
+        for (let key in updateData) {
+          // 비밀번호 수정 시 암호화 필요
+          if (key === "password") continue; // 비밀번호는 별도 처리
+          fields.push(`${key} = ?`);
+          values.push(updateData[key]);
+        }
+        values.push(userId);
+        db.query(
+          `UPDATE users SET ${fields.join(", ")} WHERE id = ?`,
+          values,
+          (err, result) => callback(err, result)
+        );
+      },
+    
+      // 계정 삭제
+      delete: (userId, callback) => {
+        db.query(
+          "DELETE FROM users WHERE id = ?",
+          [userId],
+          (err, result) => callback(err, result)
+        );
+      },
+    
 
   // refreshTokens 관리용 (테스트/개발용)
   _refreshTokens: refreshTokens,
