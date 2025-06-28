@@ -1,4 +1,60 @@
+const db = require("../config/db");
 const House = require("../models/House");
+
+// 집주인 홈: 내 정보 + 내가 등록한 빈집 목록 + 각 빈집별 매칭 현황
+exports.getOwnerHome = (req, res, next) => {
+  const ownerId = req.user.id;
+
+  // 1. 집주인(본인) 정보 조회
+  db.query(
+    "SELECT id, name, phone, email FROM users WHERE id = ?",
+    [ownerId],
+    (err, userRows) => {
+      if (err) return next(err);
+      if (userRows.length === 0)
+        return res.status(404).json({ success: false, message: "사용자 정보 없음" });
+
+      // 2. 내가 등록한 빈집 목록 조회
+      House.findByOwner(ownerId, (err2, houseRows) => {
+        if (err2) return next(err2);
+
+        if (!houseRows || houseRows.length === 0) {
+          // 빈집이 없다면 매칭 현황은 빈 배열로
+          return res.json({
+            success: true,
+            user: userRows[0],
+            houses: []
+          });
+        }
+
+        // 3. 각 빈집별 매칭 현황 조회
+        const houseIds = houseRows.map(h => h.id);
+        db.query(
+          `SELECT m.*, u.name AS careworker_name, u.phone AS careworker_phone
+           FROM matchings m
+           JOIN users u ON m.careworker_id = u.id
+           WHERE m.house_id IN (?)`,
+          [houseIds],
+          (err3, matchingRows) => {
+            if (err3) return next(err3);
+
+            // 각 집별로 매칭 내역을 매핑
+            const housesWithMatchings = houseRows.map(house => ({
+              ...house,
+              matchings: matchingRows.filter(m => m.house_id === house.id)
+            }));
+
+            res.json({
+              success: true,
+              user: userRows[0],
+              houses: housesWithMatchings
+            });
+          }
+        );
+      });
+    }
+  );
+};
 
 // 내가 등록한 빈집 목록 조회
 exports.getMyHouses = (req, res, next) => {

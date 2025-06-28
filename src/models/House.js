@@ -35,7 +35,7 @@ const House = {
       [houseId, ownerId],
       callback
     );
-  }
+  },
 };
 
 module.exports = House;

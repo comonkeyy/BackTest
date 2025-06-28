@@ -1,4 +1,4 @@
-const matchingModel = require("../models/matching");
+const matchingModel = require("../models/Matching");
 const noticeModel = require("../models/Notice");
 const userModel = require("../models/User");
 
@@ -87,3 +87,26 @@ exports.deleteUser = (req, res, next) => {
     res.json({ success: true, message: "계정이 삭제되었습니다." });
   });
 };
+
+exports.getAllHouses = (req, res, next) => {
+    const { region, status } = req.query;
+    let sql = "SELECT * FROM houses WHERE 1=1";
+    const params = [];
+  
+    if (region) {
+      sql += " AND region = ?";
+      params.push(region);
+    }
+    if (status) {
+      sql += " AND status = ?";
+      params.push(status);
+    }
+  
+    db.query(sql, params, (err, rows) => {
+      if (err) return next(err);
+      res.json({
+        success: true,
+        houses: rows
+      });
+    });
+  };

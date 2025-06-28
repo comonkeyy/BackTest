@@ -15,4 +15,6 @@ router.put("/:id", auth, houseController.updateHouse);
 // 빈집 정보 삭제
 router.delete("/:id", auth, houseController.deleteHouse);
 
+router.get("/owner-home", auth, houseController.getOwnerHome);
+
 module.exports = router;
