@@ -1,5 +1,5 @@
 // controllers/matching.controller.js
-const matchingModel = require("../models/matching");
+const matchingModel = require("../models/Matching");
 
 // 매칭 등록
 exports.createMatching = (req, res, next) => {

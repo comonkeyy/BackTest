@@ -8,7 +8,8 @@ const adminRoutes = require("./routes/admin.routes");
 const managerRoutes = require("./routes/manager.routes");
 const authRouter = require("./routes/auth.routes");
 const houseNeedRouter = require("./routes/houseNeed.routes");
-
+const careworkerMatchingRouter = require("./routes/careworkerMatching.routes");
+const careworkerRouter = require("./routes/careworker.routes"); 
 // DB 연결 실행
 require("./config/db");
 
@@ -32,10 +33,6 @@ require("./config/db");
 
 
 
-app.use(cors());
-app.use(express.json());
-const authRouter = require("./routes/auth.routes");
-const houseNeedRouter = require("./routes/houseNeed.routes");
 const reviewRouter = require("./routes/review.routes");
 const cartRouter = require("./routes/cart.routes");
 const matchingRouter = require("./routes/matching.routes");
@@ -43,11 +40,10 @@ app.use(cors()); // 모든 도메인 허용 (개발용)
 app.use(express.json()); // <-- 반드시 라우터 등록 전에!
 app.use("/api/houses", houseRoutes);
 app.use("/api/auth", authRouter);
-app.use("/api/care-workers", houseNeedRouter);
-
 app.use("/api/admin", adminRoutes);      // 관리자 회원가입/로그인
-app.use("/api/manager", managerRoutes);  // 관리자 권한 기능(매칭 등)
-
+app.use("/api/managers", managerRoutes);  // 관리자 권한 기능(매칭 등)
+app.use("/api/care-workers", careworkerMatchingRouter);
+app.use("/api/care-workers", careworkerRouter);
 app.get("/", (req, res) => {
   res.status(200).send("API 서버가 정상 작동 중입니다.");
 });

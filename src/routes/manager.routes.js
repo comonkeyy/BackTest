@@ -16,5 +16,8 @@ router.get("/users/:userId", auth, adminAuth, managerController.getUserDetail); 
 router.post("/users", auth, adminAuth, managerController.createUser);           // 계정 신규 등록
 router.patch("/users/:userId", auth, adminAuth, managerController.updateUser);  // 계정 정보 수정
 router.delete("/users/:userId", auth, adminAuth, managerController.deleteUser); // 계정 삭제
+// routes/manager.routes.js
+router.get("/houses", adminAuth, managerController.getAllHouses);
+
 
 module.exports = router;

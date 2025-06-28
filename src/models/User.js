@@ -25,7 +25,7 @@ module.exports = {
         const accessToken = jwt.sign(
           { id: user.id, user_id: user.user_id, role: user.role },
           process.env.JWT_SECRET,
-          { expiresIn: "1h" }
+          { expiresIn: "24h" }
         );
         const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
           expiresIn: "7d",
